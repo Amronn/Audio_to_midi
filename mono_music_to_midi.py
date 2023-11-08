@@ -6,12 +6,10 @@ from sklearn.preprocessing import MinMaxScaler
 import os
 
 
-model = load_model('monophonic_music_to_midi/notes_88.h5')
-file_path = 'wav_sounds/liszt_frag.wav'
+model = load_model('project_audio_to_midi/Audio_to_midi/notes_88.h5')
+file_path = 'project_audio_to_midi/Audio_to_midi/notes_88/test.wav'
 
 x, sr = librosa.load(file_path)
-
-
 
 def fourier_pitch(segment, sr=sr, fmin=16, fmax=8192):
     X = np.abs(np.fft.fft(segment))
@@ -34,7 +32,7 @@ def get_folder_names2(num):
         folder_names.append(i+21)
     return folder_names
 
-labels = get_folder_names('notes_88')
+labels = get_folder_names('project_audio_to_midi/Audio_to_midi/notes_88')
 # labels = get_folder_names2(88)
 print(labels)
 

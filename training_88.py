@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 
-folder_path = 'notes_88'
+folder_path = 'project_audio_to_midi/Audio_to_midi/notes_88'
 training_data = []
 training_labels = []
 
@@ -58,5 +58,5 @@ predicted_note = label_encoder.inverse_transform([predicted_label])[0]
 
 print(f"Predicted Note: {predicted_note}")
 
-model.save('monophonic_music_to_midi/notes_88.h5')
+model.save('project_audio_to_midi/Audio_to_midi/notes_88.h5')
 
