@@ -73,5 +73,5 @@ for i, time in enumerate(times):
     track.append(Message('note_on', note=pitches_list[i], velocity=127, time = 0))
     track.append(Message('note_off', note=pitches_list[i], velocity=127, time = time))
 
-mid.save('cqt_chroma_midi.mid')
+mid.save('Audio_to_midi/cqt_chroma_midi.mid')
 

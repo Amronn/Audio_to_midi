@@ -52,4 +52,4 @@ for i, time in enumerate(times):
     print(time)
     track.append(Message('note_off', note=pitches_list[i], velocity=127, time = time)) # tutaj nie ma znaczenia
 
-mid.save('fourier_audio_to_midi.mid')
+mid.save('Audio_to_midi/fourier_audio_to_midi.mid')
