@@ -47,9 +47,10 @@ def get_pitch(segment):
 
 oenv = librosa.onset.onset_strength(y=x, sr=sr, aggregate=np.mean, detrend=True)
 oenv[oenv < (np.max(oenv) / 10)] = 0
-onset_samples = librosa.onset.onset_detect(y=x, sr=sr, onset_envelope=oenv, backtrack=True, units='samples')
-segment_size = int(sr * 0.05)
-segments = np.array([x[i:i + segment_size] for i in onset_samples])
+onset_samples = librosa.onset.onset_detect(y=x, sr=sr, onset_envelope=oenv, backtrack=True, units='samples').astype(int)
+onset_samples = np.concatenate([onset_samples, np.array([len(x)-1])])
+segment_size = int(sr * 0.1) # długość jako 100ms
+segments = np.array([x[i:i + segment_size] for i in onset_samples], dtype=object)
 
 import matplotlib.pyplot as plt
 
