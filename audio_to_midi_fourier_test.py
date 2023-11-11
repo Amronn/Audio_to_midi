@@ -1,8 +1,8 @@
 import numpy as np
 import librosa
-file_path = 'Audio_to_midi/wav_sounds/xd1.wav'
+file_path = 'Audio_to_midi/wav_sounds/bach.mp3'
 
-x, sr = librosa.load(file_path)
+y, sr = librosa.load(file_path)
 
 
 def fourier_pitch(segment, sr=sr, fmin=16, fmax=8192):
@@ -12,20 +12,21 @@ def fourier_pitch(segment, sr=sr, fmin=16, fmax=8192):
     note = np.rint(librosa.hz_to_midi(f[np.argmax(X)])).astype(int)
     return note
 
-oenv = librosa.onset.onset_strength(y=x, sr=sr, aggregate=np.median, detrend=True)
-oenv[oenv < (np.max(oenv) / 10)] = 0
-onset_samples = librosa.onset.onset_detect(y=x, sr=sr, onset_envelope=oenv, backtrack=True, units='samples')
+oenv = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.sum, detrend=False)
+    # oenv[oenv < (np.max(oenv) / 100)] = 0
+onset_samples = librosa.onset.onset_detect(y=y, sr=sr, onset_envelope=oenv, backtrack=False, units='samples').astype(int)
+onset_samples = np.concatenate([onset_samples, np.array([len(y)-1])])
 segment_size = int(sr * 0.1)
-segments = np.array([x[i:i + segment_size] for i in onset_samples])
+segments = np.array([y[i:i + segment_size] for i in onset_samples])
 
-all_hits = np.concatenate([onset_samples, np.array([len(x) - 1])])
+all_hits = np.concatenate([onset_samples, np.array([len(y) - 1])])
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
-plt.figure(figsize=(15,6))
-librosa.display.waveshow(x,sr=sr)
-plt.vlines(librosa.samples_to_time(all_hits), ymin=-1, ymax=1)
-plt.show()
+# plt.figure(figsize=(15,6))
+# librosa.display.waveshow(y,sr=sr)
+# plt.vlines(librosa.samples_to_time(all_hits), ymin=-1, ymax=1)
+# plt.show()
 
 pitches_list = []
 
@@ -33,12 +34,12 @@ for segment in segments:
     pitch = fourier_pitch(segment)
     pitches_list.append(pitch)
 
-print(pitches_list)
+# print(pitches_list)
 
 timesx = librosa.samples_to_time(all_hits)
 times = list(int((timesx[i+1]-timesx[i])*1000) for i in range(len(timesx)-1))
 
-print(times)
+# print(times)
 
 
 from mido import Message, MidiFile, MidiTrack
