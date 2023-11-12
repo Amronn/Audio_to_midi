@@ -5,20 +5,21 @@ import scipy as sp
 import scipy.signal
 from mido import Message, MidiFile, MidiTrack
 
-# file_path = 'Audio_to_midi/wav_sounds/liszt_frag.wav'
-file_path = 'Audio_to_midi/wav_sounds/bach.mp3'
-
-hop_length = 512
+file_name = ['liszt_frag.wav','bach.mp3', '88notes.wav']
+file_path = 'Audio_to_midi/wav_sounds/'+file_name[1]
+hop_length = 256
 y, sr = librosa.load(file_path)
-
-C = np.abs(librosa.cqt(y=y, sr=sr, bins_per_octave=12*3, n_bins=12*3*7, hop_length=hop_length))
-threshold = 0.0
+y = librosa.effects.harmonic(y)
+C = np.abs(librosa.cqt(y=y, sr=sr, bins_per_octave=12*3, n_bins=12*3*7, hop_length=hop_length, filter_scale=0.6, sparsity=0.05))
+threshold = 0.5
 chroma_orig = librosa.feature.chroma_cqt(C=C, sr=sr, n_chroma=85, bins_per_octave=85*3, threshold=threshold, hop_length=hop_length)
 
+
+
 def get_onsets(y, sr):
-    oenv = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.sum, detrend=False)
+    oenv = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.average, detrend=True)
     # oenv[oenv < (np.max(oenv) / 100)] = 0
-    onset_samples = librosa.onset.onset_detect(y=y, sr=sr, onset_envelope=oenv, backtrack=False, units='samples').astype(int)
+    onset_samples = librosa.onset.onset_detect(y=y, sr=sr, onset_envelope=oenv, backtrack=True, units='samples').astype(int)
     onset_samples = np.concatenate([onset_samples, np.array([len(y)-1])])
     return onset_samples
 
@@ -41,7 +42,7 @@ for i in range(len(onset_samples_cqt)-1):
 
 chroma_av = []
 for chroma in chroma:
-    chroma_av.append(np.mean(chroma, axis=1))
+    chroma_av.append(np.sum(chroma, axis=1))
     # print(librosa.midi_to_note(np.argmax(np.mean(chroma, axis=1))+24))
 
 
