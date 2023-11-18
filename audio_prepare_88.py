@@ -1,18 +1,20 @@
 import numpy as np, librosa, os, csv
 from sklearn.preprocessing import MinMaxScaler
+import matplotlib.pyplot as plt
 number_of_keys = 85
 number_of_samples = 4
 
 note_names = ['c', 'cs', 'd', 'ds', 'e', 'f', 'fs','g','gs','a','as','b']
 
-file_path = 'Audio_to_midi/wav_sounds/piano_single_notes_labs.wav'
-hop_length = 256
+file_path = 'E:\Amron\music_processing\project_audio_to_midi\piano_notes_neo_piano.wav'
+hop_length = 512
 y, sr = librosa.load(file_path)
-y = librosa.effects.harmonic(y)
-C = np.abs(librosa.cqt(y=y, sr=sr, bins_per_octave=12*3, n_bins=12*3*7, hop_length=hop_length, filter_scale=0.6, sparsity=0.05))
+# y = librosa.effects.harmonic(y)
+C = np.abs(librosa.cqt(y=y, sr=sr, bins_per_octave=12*3, n_bins=12*3*7, hop_length=hop_length, filter_scale=0.6))
 threshold = 0.1
 chroma_orig = librosa.feature.chroma_cqt(C=C, sr=sr, n_chroma=85, bins_per_octave=85*3, threshold=threshold, hop_length=hop_length, norm=1)
-
+librosa.display.specshow(chroma_orig, y_axis='chroma', x_axis='time', sr=sr)
+plt.show()
 def get_onsets(y, sr):
     oenv = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.mean, detrend=True)
     oenv[oenv < (np.max(oenv) / 20)] = 0
@@ -25,10 +27,11 @@ onset_samples = get_onsets(y, sr)
 onset_samples = [0]
 onset_samples_cqt = [0]
 
-for i in range(340):
+for i in range(341):
     onset_samples.append(int(i*sr))
     onset_samples_cqt.append(int(i*sr/hop_length))
 
+print(onset_samples_cqt)
 
 import matplotlib.pyplot as plt
 

@@ -8,7 +8,7 @@ Xval = np.random.rand(200,1)
 yval = f(Xval)
 
 model = tf.keras.models.Sequential([
-    tf.keras.layers.Dense(10, activation='relu'),
+    tf.keras.layers.LSTM(10, activation='relu'),
     tf.keras.layers.Dense(10, activation='relu'),
     tf.keras.layers.Dense(10, activation='relu'),
     tf.keras.layers.Dense(1, activation='relu')

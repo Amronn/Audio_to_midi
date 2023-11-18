@@ -1,6 +1,6 @@
 import numpy as np
 import librosa
-file_path = 'Audio_to_midi/wav_sounds/bach.mp3'
+file_path = 'Audio_to_midi/wav_sounds/piano_test2.wav'
 
 y, sr = librosa.load(file_path)
 
@@ -12,11 +12,11 @@ def fourier_pitch(segment, sr=sr, fmin=16, fmax=8192):
     note = np.rint(librosa.hz_to_midi(f[np.argmax(X)])).astype(int)
     return note
 
-oenv = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.sum, detrend=False)
-    # oenv[oenv < (np.max(oenv) / 100)] = 0
+oenv = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.mean, detrend=True)
+oenv[oenv < (np.max(oenv) / 100)] = 0
 onset_samples = librosa.onset.onset_detect(y=y, sr=sr, onset_envelope=oenv, backtrack=False, units='samples').astype(int)
 onset_samples = np.concatenate([onset_samples, np.array([len(y)-1])])
-segment_size = int(sr * 0.1)
+segment_size = int(sr * 0.05)
 segments = np.array([y[i:i + segment_size] for i in onset_samples])
 
 all_hits = np.concatenate([onset_samples, np.array([len(y) - 1])])
@@ -50,7 +50,7 @@ mid.tracks.append(track)
 
 for i, time in enumerate(times):
     track.append(Message('note_on', note=pitches_list[i], velocity=127, time = 0)) # velocity ustawione jak narazie na stałe
-    print(time)
+    # print(time)
     track.append(Message('note_off', note=pitches_list[i], velocity=127, time = time)) # tutaj nie ma znaczenia
 
 mid.save('Audio_to_midi/fourier_audio_to_midi.mid')

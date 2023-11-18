@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 
-folder_path = 'Audio_to_midi/notes_88_cqt'
+folder_path = 'Audio_to_midi/notes_88_mels'
 x_data = []
 y_data = []
 
@@ -22,8 +22,8 @@ for folder_name in os.listdir(folder_path):
             file_path = os.path.join(folder_dir, filename)
             with open(file_path, 'r') as file:
                 reader = csv.reader(file)
-                chromas = list(reader)
-            x_data.append(np.array(chromas).T)
+                mels = list(reader)
+            x_data.append(np.array(mels).T)
             y_data.append(int(note_label))
 
 x_data = np.array(x_data).astype(float)
@@ -36,7 +36,7 @@ print(X_train[0].shape)
 
 model = Sequential()
 
-model.add(SimpleRNN(units = 85, input_shape=(1,85)))
+model.add(SimpleRNN(units = 85, input_shape=(1,128)))
 print(model.output_shape)
 model.add(Dense(170, activation='relu'))
 print(model.output_shape)
@@ -50,37 +50,7 @@ prediction = model.predict(np.array([X_train[2]]))
 
 # print(prediction)
 
-model.save('Audio_to_midi/notes_88_cqt.h5')
-# import matplotlib.pyplot as plt
-# import numpy as np
-
-# from matplotlib import cm
-# from matplotlib.ticker import LinearLocator
-
-# fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-
-# # Make data.
-# X = np.arange(0, 85, 1)
-# Y = np.arange(0, 85, 1)
-# X, Y = np.meshgrid(X, Y)
-
-# prediction = np.array(prediction)
-
-# # Ensure that the shape of the matrix matches the dimensions of X and Y
-# if prediction.shape == (len(X), len(Y)):
-#     Z = prediction
-
-#     # Plot the surface.
-#     surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
-#                            linewidth=0, antialiased=False)
-
-#     ax.zaxis.set_major_locator(LinearLocator(10))
-
-#     fig.colorbar(surf, shrink=0.5, aspect=5)
-
-#     plt.show()
-# else:
-#     print("Shape of 'prediction' does not match the dimensions of X and Y.")
+model.save('Audio_to_midi/notes_88_mels.h5')
 
 print(np.argmax(prediction))
 print(np.max(prediction))

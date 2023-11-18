@@ -7,6 +7,7 @@ import os
 
 
 model = load_model('Audio_to_midi/notes_88_cqt.h5')
+model_m = load_model('Audio_to_midi/notes_88_mels.h5')
 
 def get_folder_names(directory_path):
     folder_names = []
@@ -22,12 +23,22 @@ def get_folder_names2(num):
         folder_names.append(i+24)
     return folder_names
 
+def get_pitch_cqt(chromas):
+    prediction = model.predict(np.array([chromas]))
+    pitch_index = np.argmax(prediction)+24
+    return pitch_index
+
+def get_pitch_mel(mels):
+    prediction = model_m.predict(np.array([mels]))
+    pitch_index = np.argmax(prediction)+24
+    return pitch_index
+
 # labels = get_folder_names('Audio_to_midi/notes_88_cqt')
 labels = get_folder_names2(88)
 # print(labels)
 
 file_name = ['liszt_frag.wav','bach.mp3', '88notes.wav', 'piano_test.wav']
-file_path = 'Audio_to_midi/wav_sounds/'+file_name[2]
+file_path = 'Audio_to_midi/wav_sounds/'+file_name[0]
 hop_length = 256
 y, sr = librosa.load(file_path)
 # y=librosa.effects.harmonic(y=y)
@@ -43,7 +54,7 @@ def get_onsets(y, sr):
     return onset_samples
 
 onset_samples = get_onsets(y, sr)
-print(onset_samples)
+# print(onset_samples)
 
 onset_samples_cqt = (onset_samples/hop_length).astype(int)
 # print(onset_samples_cqt)
@@ -51,29 +62,27 @@ chroma=[]
 for i in range(len(onset_samples_cqt)-1):
     chroma.append(chroma_orig[:, onset_samples_cqt[i]:onset_samples_cqt[i+1]])
 
-
-
-def get_pitch(segment):
-    mel_spec = librosa.feature.melspectrogram(y=segment, sr=sr, hop_length=256, n_mels=128, n_fft=512)
-    scaler = MinMaxScaler()
-    mel_spec = scaler.fit_transform(mel_spec)
-    mel_spec = np.expand_dims(mel_spec, axis=0)
-    prediction = model.predict(mel_spec)
-    pitch_index = np.argmax(prediction)
-    return pitch_index
-
-def get_pitch2(chromas):
-    print(chromas.shape)
-    prediction = model.predict(np.array([chromas]))
-    pitch_index = np.argmax(prediction)+24
-    return pitch_index
+segment_size = int(sr * 0.05)
+segments = np.array([y[i:i + segment_size] for i in onset_samples[:len(onset_samples)-1]])
+mels = []
+for seg in segments:
+    mel_spect = librosa.feature.melspectrogram(y=seg, sr=sr, n_fft=2048, hop_length=256)
+    mel_spect = np.mean(mel_spect, axis = 1)
+    mels.append(mel_spect)
 
 pitches_list = []
-chroma_av = []
-for chroma in chroma:
-    chroma_av.append(np.mean(chroma, axis=1))
-    print(np.sum(chroma, axis=1).shape)
-    pitches_list.append(get_pitch2(np.expand_dims(np.mean(chroma, axis=1), axis=0)))
+
+def get_pitch_chromas(get_pitch, chroma, pitches_list):
+    for chroma in chroma:
+        pitches_list.append(get_pitch(np.expand_dims(np.mean(chroma, axis=1), axis=0)))
+
+def get_pitch_mels(get_pitch, mels, pitches_list):
+    for mel in mels:
+        pitches_list.append(get_pitch(np.expand_dims(mel, axis=0)))
+
+# get_pitch_mels(get_pitch_mel, mels, pitches_list)
+
+get_pitch_chromas(get_pitch_cqt, chroma, pitches_list)
 
 timesx = librosa.samples_to_time(onset_samples)
 
@@ -89,6 +98,8 @@ from mido import Message, MidiFile, MidiTrack
 mid = MidiFile()
 track = MidiTrack()
 mid.tracks.append(track)
+
+print(times)
 
 for i, time in enumerate(times):
     track.append(Message('note_on', note=pitches_list[i], velocity=127, time = 0))
