@@ -7,15 +7,15 @@ from mido import Message, MidiFile, MidiTrack
 
 file_name = ['liszt_frag.wav','bach.mp3', '88notes.wav']
 file_path = 'Audio_to_midi/wav_sounds/'+file_name[0]
-# file_path = 'Audio_to_midi/wav_sounds/piano_test.wav'
+# file_path = 'Audio_to_midi/wav_sounds/piano_test2.wav'
 hop_length = 256
 y, sr = librosa.load(file_path)
-# y = librosa.effects.harmonic(y)
+
 
 C = np.abs(librosa.cqt(y=y, sr=sr, bins_per_octave=12*3, n_bins=12*3*7, hop_length=hop_length))
 threshold = 0.0
 chroma_orig = librosa.feature.chroma_cqt(C=C, sr=sr, n_chroma=85, bins_per_octave=85*3, threshold=threshold, hop_length=hop_length)
-chroma_orig = scipy.signal.convolve2d(chroma_orig, np.ones((1,5))/10)
+# chroma_orig = scipy.signal.convolve2d(chroma_orig, np.ones((1,4))/10)
 ''' jakas dziwna moja metoda nie wyszła
 def correct_pitch(chroma, threshold=0.1, wiener_size=3):
     chroma = scipy.signal.wiener(chroma, wiener_size)
@@ -35,10 +35,32 @@ def correct_pitch(chroma, threshold=0.1, wiener_size=3):
 '''
 #korelacja z kolejnymi harmonicznymi
 def alikwot_check(chroma, num_of_harmonics = 3):
-    har = [0, 12, 19, 24, 28, 31, 34, 36, 38, 39, 40, 42, 43,44,45]
-    check = np.correlate(chroma, har[:num_of_harmonics], mode='full')
-    return np.argmax(check)+24
-    
+    # chroma = np.convolve(chroma, np.array([5,5]))
+    # chroma[chroma>0.05] = 1
+    # chroma[chroma<=0.05] = 0
+    chroma2 = scipy.signal.wiener(chroma, 3)
+    threshold = 0.15
+    chroma2[chroma2<threshold]=0
+    peaks, what = scipy.signal.find_peaks(chroma2)
+    #korekta wysokości w zależności od wpływu harmonicznych. Zakładam, że dźwiękiem podstawowym jest pierwsza harmoniczna.
+    if len(peaks)==1:
+        return int(peaks[0])+24
+    check = 0
+    if len(peaks)>1:
+        har = [0, 12, 19, 24, 28, 31, 34, 36, 38, 39, 40, 42, 43,44,45]
+        harmoniczne = np.zeros(85)
+        k=0        
+
+        check = np.correlate(chroma, harmoniczne, 'full')
+        for i in range(len(peaks)):
+            har = har[:6-i]
+            for i in har:
+                harmoniczne[i] = 0.5 + np.exp(-k)
+                k=k+1
+            check2 = np.correlate(chroma, harmoniczne, 'full')
+            check = check + check2
+
+        return np.argmax(check[84:])+24
 
 def get_onsets(y, sr):
     oenv = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.mean, detrend=True)
@@ -49,9 +71,9 @@ def get_onsets(y, sr):
 
 onset_samples = get_onsets(y, sr)
 
-librosa.display.specshow(chroma_orig, y_axis='chroma', x_axis='time', sr=sr)
-plt.grid()
-plt.show()
+# librosa.display.specshow(chroma_orig, y_axis='chroma', x_axis='time', sr=sr)
+# plt.grid()
+# plt.show()
 
 # plt.figure(figsize=(15,6))
 # librosa.display.waveshow(y,sr=sr)
@@ -78,7 +100,7 @@ for chroma_av in chroma_av:
 
 timesx = librosa.samples_to_time(onset_samples)
 times = list(int((timesx[i+1]-timesx[i])*1000) for i in range(len(timesx)-1))
-print(times)
+# print(times)
 def create_midi(pitches_list, times):
     mid = MidiFile()
     track = MidiTrack()

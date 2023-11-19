@@ -11,31 +11,44 @@ def get_onsets(y, sr):
     return onset_samples
 
 
-def alikwot_check(num_of_harmonics = 3):
-    har = [0, 12, 19, 24, 28, 31, 34, 36, 38, 39, 40, 42, 43,44,45]
+num = 4
 
-    alikwoty = []
-    for i in range(85):
-        a = np.zeros(85)
-        indices = [i, i + 12, i + 12 + 7, i + 12 + 7 + 5]
-        indices = [i + har[k] for k in range(num_of_harmonics+1)]
-        indices = [idx for idx in indices if idx < 85]
-        a[indices] = 1
-        alikwoty.append(a)
-    check = []
-    for i in range(85):
-        cor = np.correlate(alikwoty[i], chroma)
-        check.append(cor)
+def alikwot_check(chroma, num_of_harmonics = 3):
+    # chroma = np.convolve(chroma, np.array([5,5]))
+    # chroma[chroma>0.05] = 1
+    # chroma[chroma<=0.05] = 0
+    chroma2 = scipy.signal.wiener(chroma, 3)
+    threshold = 0.1
+    chroma2[chroma2<threshold]=0
+    peaks, what = scipy.signal.find_peaks(chroma2)
+    x = range(85)
+    plt.plot(chroma2)
+    plt.show()
+    #korekta wysokości w zależności od wpływu harmonicznych. Zakładam, że dźwiękiem podstawowym jest pierwsza harmoniczna.
+    if len(peaks)==1:
+        return int(peaks[0])+24
+    check = 0
+    if len(peaks)>1:
+        har = [0, 12, 19, 24, 28, 31, 34, 36, 38, 39, 40, 42, 43,44,45]
+        harmoniczne = np.zeros(85)
+        k=0
+        for i in har:
+            harmoniczne[i] = 1 + np.exp(-k)
+            k=k+1
         
-    return np.argmax(check)+24
+        x = range(0,85)
+        plt.plot(x, harmoniczne, 'o', label='Dane punkty')
+        plt.legend()
+        plt.show()
+        check = np.correlate(chroma2, harmoniczne, 'full')
+        plt.plot(check[84:])
+        plt.show()
+        return np.argmax(check[84:])+24
 
-def generate_harmonic_indices(num_harmonicznych):
-    harmonic_indices = [i for i in range(0, num_harmonicznych * 24, 24)]
-    return harmonic_indices
-
-print(generate_harmonic_indices(7))
 
 file_path = 'Audio_to_midi/wav_sounds/liszt_frag.wav'
+# file_path = 'Audio_to_midi/wav_sounds/piano_test2.wav'
+
 hop_length = 256
 y, sr = librosa.load(file_path)
 
@@ -46,19 +59,19 @@ chroma_orig = librosa.feature.chroma_cqt(C=C, sr=sr, n_chroma=85, bins_per_octav
 onset_samples = get_onsets(y, sr)
 cqt_points = (onset_samples/hop_length).astype(int)
 
-chroma = chroma_orig[:,cqt_points[0]:cqt_points[1]-10]
+chroma = chroma_orig[:,cqt_points[num-1]:cqt_points[num]-10]
 
-# librosa.display.specshow(data = chroma, y_axis='chroma', x_axis='time', sr=sr,hop_length=hop_length)
-# plt.show()
+librosa.display.specshow(data = chroma, y_axis='chroma', x_axis='time', sr=sr,hop_length=hop_length)
+plt.show()
 
 chroma = np.mean(chroma, axis = 1)
 
-pitch = alikwot_check()
+pitch = alikwot_check(chroma)
 print(pitch)
 
 har = [0, 12, 19, 24, 28, 31, 34, 36, 38, 39, 40, 42, 43,44,45]
 x = range(len(har))
 
-plt.plot(x, har)
-plt.show()
+# plt.plot(x, har)
+# plt.show()
 
