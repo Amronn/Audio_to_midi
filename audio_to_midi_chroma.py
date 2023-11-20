@@ -7,7 +7,7 @@ from mido import Message, MidiFile, MidiTrack
 
 file_name = ['liszt_frag.wav','bach.mp3', '88notes.wav']
 file_path = 'Audio_to_midi/wav_sounds/'+file_name[0]
-# file_path = 'Audio_to_midi/wav_sounds/piano_test2.wav'
+# file_path = 'Audio_to_midi/wav_sounds/piano_test.wav'
 hop_length = 256
 y, sr = librosa.load(file_path)
 
@@ -15,7 +15,7 @@ y, sr = librosa.load(file_path)
 C = np.abs(librosa.cqt(y=y, sr=sr, bins_per_octave=12*3, n_bins=12*3*7, hop_length=hop_length))
 threshold = 0.0
 chroma_orig = librosa.feature.chroma_cqt(C=C, sr=sr, n_chroma=85, bins_per_octave=85*3, threshold=threshold, hop_length=hop_length)
-# chroma_orig = scipy.signal.convolve2d(chroma_orig, np.ones((1,4))/10)
+chroma_orig = scipy.signal.convolve2d(chroma_orig, np.ones((1,4))/10)
 ''' jakas dziwna moja metoda nie wyszła
 def correct_pitch(chroma, threshold=0.1, wiener_size=3):
     chroma = scipy.signal.wiener(chroma, wiener_size)
@@ -33,15 +33,28 @@ def correct_pitch(chroma, threshold=0.1, wiener_size=3):
         pitch = np.argmax(chroma)
     return pitch
 '''
+def avr_w(data):
+    n = len(data)
+    weights = [np.exp(-i/10)*10 for i in range(1, n+1)]
+    average_with_weights = sum(w * x for w, x in zip(weights, data)) / sum(weights)
+    return average_with_weights
+
 #korelacja z kolejnymi harmonicznymi
 def alikwot_check(chroma, num_of_harmonics = 3):
     # chroma = np.convolve(chroma, np.array([5,5]))
     # chroma[chroma>0.05] = 1
     # chroma[chroma<=0.05] = 0
     chroma2 = scipy.signal.wiener(chroma, 3)
-    threshold = 0.15
+    threshold = 0.1
     chroma2[chroma2<threshold]=0
     peaks, what = scipy.signal.find_peaks(chroma2)
+    # x = range(85)
+    # plt.plot(chroma2)
+    # plt.show()
+    # chroma2[chroma2>0.1] = 1
+    # chroma2[chroma2<0.1] = 0
+    # plt.plot(chroma2)
+    # plt.show()
     #korekta wysokości w zależności od wpływu harmonicznych. Zakładam, że dźwiękiem podstawowym jest pierwsza harmoniczna.
     if len(peaks)==1:
         return int(peaks[0])+24
@@ -49,17 +62,18 @@ def alikwot_check(chroma, num_of_harmonics = 3):
     if len(peaks)>1:
         har = [0, 12, 19, 24, 28, 31, 34, 36, 38, 39, 40, 42, 43,44,45]
         harmoniczne = np.zeros(85)
-        k=0        
-
-        check = np.correlate(chroma, harmoniczne, 'full')
-        for i in range(len(peaks)):
-            har = har[:6-i]
-            for i in har:
-                harmoniczne[i] = 0.5 + np.exp(-k)
-                k=k+1
-            check2 = np.correlate(chroma, harmoniczne, 'full')
-            check = check + check2
-
+        k=0
+        for i in har[:4]:
+            harmoniczne[i] = 1 + np.exp(-2*k)
+            k=k+1
+        
+        # x = range(0,85)
+        # plt.plot(x, harmoniczne, 'o', label='Dane punkty')
+        # plt.legend()
+        # plt.show()
+        check = np.correlate(chroma2, harmoniczne, 'full')
+        # plt.plot(check[84:])
+        # plt.show()
         return np.argmax(check[84:])+24
 
 def get_onsets(y, sr):
@@ -70,26 +84,36 @@ def get_onsets(y, sr):
     return onset_samples
 
 onset_samples = get_onsets(y, sr)
+onset_samples = np.unique(onset_samples)
 
 # librosa.display.specshow(chroma_orig, y_axis='chroma', x_axis='time', sr=sr)
 # plt.grid()
 # plt.show()
 
-# plt.figure(figsize=(15,6))
-# librosa.display.waveshow(y,sr=sr)
-# plt.vlines(librosa.samples_to_time(onset_samples), ymin=-1, ymax=1)
-# plt.show()
+plt.figure(figsize=(15,6))
+librosa.display.waveshow(y,sr=sr)
+plt.vlines(librosa.samples_to_time(onset_samples), ymin=-1, ymax=1)
+plt.show()
 
 
 onset_samples_cqt = (onset_samples/hop_length).astype(int)
-# print(onset_samples_cqt)
+print(onset_samples_cqt)
 chroma=[]
 for i in range(len(onset_samples_cqt)-1):
-    chroma.append(chroma_orig[:, onset_samples_cqt[i]:onset_samples_cqt[i+1]-10])
+    chroma.append(chroma_orig[:, onset_samples_cqt[i]:onset_samples_cqt[i+1]])
 
 chroma_av = []
+i=0
 for chroma in chroma:
-    chroma_av.append(np.mean(chroma, axis=1))
+    chromas = []
+    
+    print(i)
+    for ch in chroma:
+        
+        print(len(ch))
+        chromas.append(avr_w(ch))
+    i=i+1
+    chroma_av.append(chromas)
     # print(librosa.midi_to_note(np.argmax(np.mean(chroma, axis=1))+24))
 
 
