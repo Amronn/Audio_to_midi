@@ -1,9 +1,9 @@
 import numpy as np, librosa
 file_name = ['liszt_frag.wav','bach.mp3', '88notes.wav']
-file_path = 'Audio_to_midi/wav_sounds/'+file_name[1]
+file_path = 'wav_sounds/'+file_name[1]
 y, sr = librosa.load(file_path)
 
-f0, voicing, voicing_p = librosa.pyin(y=y, sr=sr)
+f0, voicing, voicing_p = librosa.pyin(y=y, sr=sr, fmin=16, fmax=8192)
 S = np.abs(librosa.stft(y))
 freqs = librosa.fft_frequencies(sr=sr)
 harmonics = np.array([1])
