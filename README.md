@@ -1,7 +1,7 @@
 # Audio_to_midi
 
 Głównym celem projektu jest rozpoznanie dźwięków w utworach polifonicznych z użyciem różnych metod. Większość oparte na bibiotekach librosa, numpy, scipy itp.
-
+Programy znajdują się w folderze monophonic/audio_to_midi
 Do tej pory udało mi się zrobić tymi metodami:
 
 1. Stft - audio_to_midi_fourier_test.py - Łatwo się psuje
