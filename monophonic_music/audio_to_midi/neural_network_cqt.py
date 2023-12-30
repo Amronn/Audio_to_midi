@@ -77,7 +77,7 @@ for i, time in enumerate(times):
     track.append(Message('note_on', note=pitches_list[i], velocity=127, time = 0))
     track.append(Message('note_off', note=pitches_list[i], velocity=127, time = time))
 
-mid.save('audio_to_midi_test.mid')
+mid.save('monophonic_music/audio_to_midi/audio_to_midi_test.mid')
 
 
 
