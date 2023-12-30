@@ -7,7 +7,8 @@ notes = [f0*a**n for n in range(85)]
 num_har = 8
 alikwoty = []
 for i in range(85):
-    alikwoty.append(librosa.hz_to_midi([notes[i]*n for n in range(1,num_har+1)]).astype(int))
+    # alikwoty.append(librosa.hz_to_midi([notes[i]*n for n in range(1,num_har+1)]).astype(int))
+    alikwoty.append(librosa.hz_to_midi([notes[i]*n for n in range(1,num_har+1)]))
 
 print(alikwoty)
 while True:

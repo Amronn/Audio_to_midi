@@ -7,6 +7,7 @@ import scipy.signal
 from mido import Message, MidiFile, MidiTrack
 file_path = 'wav_sounds/piano_2_notes.wav'
 file_path = 'wav_sounds\piano_test2.wav'
+file_path = 'wav_sounds/four_chords.wav'
 # file_path = 'wav_sounds\piano_chords_123.wav'
 # file_path = 'wav_sounds\liszt_frag.wav'
 hop_length = 256

@@ -6,6 +6,7 @@ import scipy.signal
 from mido import Message, MidiFile, MidiTrack
 
 file_path = 'wav_sounds/piano_chords_scale_in_C.wav'
+file_path = 'wav_sounds/four_chords.wav'
 hop_length = 256
 y, sr = librosa.load(file_path)
 
@@ -24,6 +25,7 @@ def avr_w(data):
 
 
 def alikwot_check(chroma, num_of_harmonics = 6):
+    chroma  = scipy.signal.wiener(chroma, 7)
     har = [0, 12, 19, 24, 28, 31, 34, 36, 38, 39, 40, 42, 43,44,45]
     harmoniczne = np.zeros(85)
     k=0

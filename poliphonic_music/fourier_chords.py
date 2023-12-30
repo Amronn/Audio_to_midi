@@ -4,8 +4,8 @@ import scipy.ndimage
 import librosa
 import matplotlib.pyplot as plt
 # file_path = 'wav_sounds/piano_sample_2.wav'
-file_path = 'wav_sounds/liszt_frag.wav'
-# file_path = 'wav_sounds/piano_chords_scale_in_C.wav'
+# file_path = 'wav_sounds/liszt_frag.wav'
+file_path = 'wav_sounds/four_chords.wav'
 x, sr = librosa.load(file_path)
 
 num = 1
@@ -29,14 +29,14 @@ def fourier_pitch(segment, sr=sr, num_of_harmonics = 10, fmin=16, fmax=8192):
         if len(harmoniczne)>0:
             for h in harmoniczne:
                 signal = signal+np.cos(2*np.pi*h*x)
-            plt.plot(x, signal)
-            plt.show()
+            # plt.plot(x, signal)
+            # plt.show()
             X2 = np.abs(np.fft.fft(signal))
             X2 /= np.max(X2)
             X2[X2>0.1] = 1
             X2[X2<=0.1] = 0
             f = np.linspace(0, sr, len(X2))
-            plt.plot(f, X2)
+            # plt.plot(f, X2)
             
 def fourier_pitch2(segment, sr=sr, num_of_harmonics = 10, fmin=16, fmax=8192):
     X = np.abs(np.fft.fft(segment, fmax-fmin))

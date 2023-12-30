@@ -2,7 +2,7 @@ import numpy as np
 import librosa
 import matplotlib.pyplot as plt
 
-file_path = 'Audio_to_midi/wav_sounds/bach.mp3'
+file_path = 'wav_sounds/four_chords.wav'
 
 y, sr = librosa.load(file_path)
 
@@ -15,14 +15,14 @@ segments = np.array([y[i:i + segment_size] for i in onset_samples])
 
 all_hits = np.concatenate([onset_samples, np.array([len(y) - 1])])
 
-# plt.figure(figsize=(15,6))
-# librosa.display.waveshow(y,sr=sr)
-# plt.vlines(librosa.samples_to_time(all_hits), ymin=-1, ymax=1)
-# plt.show()
+plt.figure(figsize=(15,6))
+librosa.display.waveshow(y,sr=sr)
+plt.vlines(librosa.samples_to_time(all_hits), ymin=-1, ymax=1)
+plt.show()
 
 mel_spect = librosa.feature.melspectrogram(y=y[0:20000], sr=sr, n_fft=2048, hop_length=256)
 mel_spect = librosa.power_to_db(mel_spect, ref=np.max)
-librosa.display.specshow(mel_spect, y_axis='mel', fmax=2000, x_axis='time')
+librosa.display.specshow(mel_spect, y_axis='mel', x_axis='time')
 plt.title('Mel Spectrogram')
 plt.colorbar(format='%+2.0f dB')
 plt.show()
