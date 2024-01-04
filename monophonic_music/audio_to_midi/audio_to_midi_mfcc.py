@@ -2,8 +2,10 @@ import numpy as np
 import librosa
 import matplotlib.pyplot as plt
 
-file_path = 'wav_sounds/four_chords.wav'
+#to nie działa, bo nie jest zrobione
 
+file_name = ['liszt_frag.wav','bach.mp3', '88notes.wav']
+file_path = 'wav_sounds/'+file_name[0]
 y, sr = librosa.load(file_path)
 
 oenv = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.mean, detrend=False)
@@ -26,9 +28,6 @@ librosa.display.specshow(mel_spect, y_axis='mel', x_axis='time')
 plt.title('Mel Spectrogram')
 plt.colorbar(format='%+2.0f dB')
 plt.show()
-
-
-'''
 
 pitches_list = []
 
@@ -55,6 +54,4 @@ for i, time in enumerate(times):
     print(time)
     track.append(Message('note_off', note=pitches_list[i], velocity=127, time = time)) # tutaj nie ma znaczenia
 
-mid.save('Audio_to_midi/fourier_audio_to_midi.mid')
-
-'''
+mid.save('monophonic_music/audio_to_midi/mfcc_audio_to_midi.mid')

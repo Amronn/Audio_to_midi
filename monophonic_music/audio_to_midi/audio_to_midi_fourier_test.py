@@ -3,16 +3,15 @@ import librosa
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 import scipy.signal
-file_path = 'wav_sounds/liszt_frag.wav'
-file_path = 'wav_sounds/piano_sample_2.wav'
-file_path = 'wav_sounds/piano_chords_scale_in_C.wav'
+file_name = ['liszt_frag.wav','bach.mp3', '88notes.wav']
+file_path = 'wav_sounds/'+file_name[0]
 y, sr = librosa.load(file_path)
 
 
 def fourier_pitch(segment, sr=sr, fmin=16, fmax=8192):
     X = np.abs(np.fft.fft(segment, int(fmax - fmin)))
     X = X[int(fmin * len(X) / sr):int(fmax * len(X) / sr)]
-    f = np.linspace(fmin, fmax, len(X)) # Use linspace with len(X) instead of fmax - fmin
+    f = np.linspace(fmin, fmax, len(X))
     note = np.rint(librosa.hz_to_midi(f[np.argmax(X)])).astype(int)
     f0 = 32.70
     a = 2**(1/12)
@@ -24,8 +23,8 @@ def fourier_pitch(segment, sr=sr, fmin=16, fmax=8192):
     print(new_note)
     new_note[new_note>1] = 1
     X*=new_note
-    plt.plot(f, X)
-    plt.show()
+    # plt.plot(f, X)
+    # plt.show()
     #przez przypadek prawie wynalazłem od nowa chromagram...
     return note
 
@@ -44,9 +43,9 @@ def fourier_pitch2(segment, sr=sr, num_of_harmonics = 10, fmin=16, fmax=8192):
             break
     print(f[first])
     avr = np.ones_like(f)*avr
-    plt.plot(f, X)
-    plt.plot(f, avr)
-    plt.show()
+    # plt.plot(f, X)
+    # plt.plot(f, avr)
+    # plt.show()
     note = np.rint(librosa.hz_to_midi(f[first])).astype(int)
     return note
 oenv = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.mean, detrend=True)
@@ -90,4 +89,4 @@ for i, time in enumerate(times):
     # print(time)
     track.append(Message('note_off', note=pitches_list[i], velocity=127, time = time)) # tutaj nie ma znaczenia
 
-mid.save('fourier_audio_to_midi.mid')
+mid.save('monophonic_music/audio_to_midi/fourier_audio_to_midi.mid')

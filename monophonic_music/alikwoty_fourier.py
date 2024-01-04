@@ -4,10 +4,10 @@ import scipy
 import scipy.signal
 import matplotlib.pyplot as plt
 import csv
-file_path = 'wav_sounds/piano_chords_123.wav'
-file_path = 'wav_sounds/casio_c.wav'
-file_path = 'wav_sounds/casio_chords.wav'
-
+# file_path = 'wav_sounds/piano_chords_123.wav'
+# file_path = 'wav_sounds/casio_c.wav'
+# file_path = 'wav_sounds/casio_chords.wav'
+file_path = 'wav_sounds/piano_sample.wav'
 csv_path = 'fourier_test.csv'
 
 y, sr = librosa.load(file_path)
@@ -19,7 +19,7 @@ def fourier_pitch(segment, sr=sr, fmin=16, fmax=8192):
     note = np.rint(librosa.hz_to_midi(f[np.argmax(X)])).astype(int)
     return note
 
-number_of_segment = 2
+number_of_segment = 1
 
 def fourier_pitch2(segment, sr=sr, num_of_harmonics = 4, fmin=16, fmax=8192):
     N = len(segment)

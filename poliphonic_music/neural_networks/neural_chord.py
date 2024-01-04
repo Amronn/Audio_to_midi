@@ -1,0 +1,95 @@
+from keras.models import Sequential
+from keras.layers import Dense, Flatten, Conv2D, SimpleRNN, LSTM, Dropout, Conv1D
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+import csv
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from keras.optimizers import Adam
+
+cqt_path = 'poliphonic_music/chords_cqt_1000'
+labels_path = 'poliphonic_music/chord_data2.csv'
+
+times_read = []
+chords_read = []
+
+with open(labels_path, mode='r') as file:
+    reader = csv.reader(file)
+    header = next(reader)
+    for row in reader:
+        times_read.append(int(row[0]))
+        chords_read.append([int(note) for note in row[1:]])
+        
+labels = []
+
+for chord in chords_read:
+    a = np.zeros(109)
+    a[chord] = 1
+    a = a[21:]
+    labels.append(a)
+
+labels = np.array(labels)
+
+num_of_notes = [len(chord) for chord in chords_read]
+cqt = []
+for filename in os.listdir(cqt_path):
+    if filename.endswith('.csv'):
+        file_path = os.path.join(cqt_path, filename)
+        with open(file_path, 'r') as file:
+            reader = csv.reader(file)
+            chromas = list(reader)
+        cqt.append(chromas)
+
+cqt = np.array(cqt).astype(float)
+num_of_notes = np.array(num_of_notes)
+
+X_train, X_test, y_train, y_test = train_test_split(cqt, labels, test_size=0.4, random_state=43)
+
+model = Sequential()
+model.add(Dense(512, activation='relu', input_shape=(88,)))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(88, activation='sigmoid'))
+
+
+
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+model.fit(X_train, y_train, epochs=500, batch_size=40, validation_data=(X_test, y_test))
+
+prediction = model.predict(np.array([X_test[2]]))
+
+# print(y_test[2])
+
+model.save('num_cqt.h5')
+
+# plt.figure(figsize=(12, 6))
+
+# plt.subplot(1, 2, 1)
+# plt.plot(history.history['accuracy'])
+# plt.plot(history.history['val_accuracy'])
+# plt.title('Model accuracy')
+# plt.xlabel('Epoch')
+# plt.ylabel('Accuracy')
+# plt.legend(['Train', 'Validation'], loc='upper left')
+
+# plt.subplot(1, 2, 2)
+# plt.plot(history.history['loss'])
+# plt.plot(history.history['val_loss'])
+# plt.title('Model loss')
+# plt.xlabel('Epoch')
+# plt.ylabel('Loss')
+# plt.legend(['Train', 'Validation'], loc='upper left')
+
+# plt.tight_layout()
+# plt.show()
+
+# print(prediction[0])
+tab = []
+for i in range(88):
+    if y_test[2][i]==1:
+        tab.append(i)
+plt.plot(prediction[0])
+plt.vlines(tab, ymin=0, ymax=1, color='red')
+plt.show()
