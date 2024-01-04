@@ -13,8 +13,8 @@ notes = ['c', 'cs', 'd', 'ds', 'e', 'f', 'fs', 'g','gs','a','as','h']
 hop_length = 256
 y, sr = librosa.load(file_path)
 
-model_o = load_model('octaves_cqt.h5')
-model_n = load_model('notes_12_cqt.h5')
+model_o = load_model('models/octaves_cqt.h5')
+model_n = load_model('models/notes_12_cqt.h5')
 
 pitches_list = []
 octave = []
@@ -75,11 +75,8 @@ for i, time in enumerate(times):
     track.append(Message('note_on', note=pitches_list[i], velocity=127, time = 0))
     track.append(Message('note_off', note=pitches_list[i], velocity=127, time = time))
 
-<<<<<<< HEAD
 mid.save('monophonic_music/audio_to_midi/cqt_neural_to_midi.mid')
-=======
-mid.save('monophonic_music/audio_to_midi/audio_to_midi_test.mid')
->>>>>>> 2df65196281b70eb340851d79d98436f2df40048
+
 
 
 

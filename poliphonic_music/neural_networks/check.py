@@ -7,7 +7,7 @@ import csv
 from sklearn.model_selection import train_test_split
 from keras.models import load_model
 
-model = load_model('num_cqt.h5')
+model = load_model('models/num_cqt.h5')
 
 cqt_path = 'poliphonic_music/chords_cqt_2'
 cqt = []

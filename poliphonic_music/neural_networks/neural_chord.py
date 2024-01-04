@@ -62,7 +62,7 @@ prediction = model.predict(np.array([X_test[2]]))
 
 # print(y_test[2])
 
-model.save('num_cqt.h5')
+model.save('models/num_cqt.h5')
 
 # plt.figure(figsize=(12, 6))
 

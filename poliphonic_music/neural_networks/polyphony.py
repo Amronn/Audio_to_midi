@@ -7,7 +7,7 @@ import os
 import matplotlib.pyplot as plt
 from fun import get_onsets, chroma
 
-model = load_model('num_cqt.h5')
+model = load_model('models/num_cqt.h5')
 
 file_name = ['liszt_frag.wav','bach.mp3', '88notes.wav', 'piano_test.wav', 'piano_test.wav','test_piano_a0_c2.wav', 'test_5.wav']
 file_path = 'wav_sounds/'+file_name[0]
