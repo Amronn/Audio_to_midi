@@ -20,16 +20,20 @@ chroma_orig = chroma(hop_length, y, sr, 88)
 onset_samples = get_onsets(y, sr)
 onset_samples_cqt = onset_samples//hop_length
 
-chroma = []
+chrom = []
+# for i in range(len(onset_samples_cqt)-1):
+#     chrom.append(chroma_orig[:, onset_samples_cqt[i]:onset_samples_cqt[i+1]-10])
 for i in range(len(onset_samples_cqt)-1):
-    chroma.append(chroma_orig[:, onset_samples_cqt[i]:onset_samples_cqt[i+1]-10])
-
+    chrom.append(chroma_orig[:, onset_samples_cqt[i]:onset_samples_cqt[i]+32].T)
+    
 chroma_av = []
-for chroma in chroma:
-    chroma_av.append(np.mean(chroma, axis=1))
+for chroma1 in chrom:
+    chroma_av.append(np.mean(chroma1, axis=1))
 
-prediction = model.predict(np.array([chroma_av[5]]))
+print(chrom[0].shape)
+num = 1
+prediction = model.predict(np.array([chrom[num]]))
 
 plt.plot(prediction[0])
-plt.plot(chroma_av[5], 'r')
+plt.plot(chrom[num].T, 'r')
 plt.show()
