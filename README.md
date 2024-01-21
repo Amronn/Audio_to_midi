@@ -12,3 +12,4 @@ Programy znajdują się w folderze monophonic/audio_to_midi.
 Do segmentacji poszczególnych dźwięków została użyta funkcja onset_detect z biblioteki Librosa.
 
 Nagranie dotyczące działania projektu - https://youtu.be/2y9CeWTdmJc
+Projekt znajduje się w monophonic/audio_to_midi/neural_network_cqt.py
