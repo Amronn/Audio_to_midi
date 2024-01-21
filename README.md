@@ -11,4 +11,4 @@ Programy znajdują się w folderze monophonic/audio_to_midi.
    
 Do segmentacji poszczególnych dźwięków została użyta funkcja onset_detect z biblioteki Librosa.
 
-Nagranie dotyczące działania projektu - https://youtu.be/nA6zF8v83w8
+Nagranie dotyczące działania projektu - https://youtu.be/2y9CeWTdmJc
