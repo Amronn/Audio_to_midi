@@ -8,8 +8,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from keras.optimizers import Adam
 
-cqt_path = 'poliphonic_music/chords_cqt_1000_2'
-labels_path = 'poliphonic_music/chord_data2.csv'
+cqt_path = 'poliphonic_music/chords_cqt_1000'
+labels_path = 'poliphonic_music/chord_data.csv'
 
 times_read = []
 chords_read = []
@@ -47,14 +47,9 @@ print(cqt.shape)
 num_of_notes = np.array(num_of_notes)
 
 X_train, X_test, y_train, y_test = train_test_split(cqt, labels, test_size=0.3, random_state=15)
-from keras.regularizers import l2
-from keras.layers import LSTM, Bidirectional, GlobalAveragePooling1D
+
 model = Sequential()
-# model.add(SimpleRNN(64, activation='relu', input_shape=(88, 32), return_sequences=True))
-# model.add(LSTM(64, input_shape=(32, 88)))
-# model.add(GlobalAveragePooling1D())
-# model.add(Conv1D(16, 3, input_shape=(32,88)))
-# model.add(Flatten())
+
 model.add(Dense(128, activation='relu',input_shape=(32,88)))
 model.add(Flatten())
 model.add(Dense(128, activation='relu'))

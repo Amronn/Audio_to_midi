@@ -3,7 +3,7 @@ from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 import fun
 file_path = 'wav_sounds/chords_neo_piano_1000.wav'
-hop_length = 256
+hop_length = 512
 y, sr = librosa.load(file_path)
 
 chroma_orig = fun.chroma(hop_length, y, sr, 88)
@@ -37,7 +37,7 @@ print(len(chroma_av))
 # plt.grid()
 # plt.show()
 
-folder_path = f'poliphonic_music/chords_cqt_1000_2'
+folder_path = f'poliphonic_music/chords_cqt_1000'
 os.makedirs(folder_path, exist_ok=True)
 for i in range(1000):
     f_name = f'chroma_{i}.csv'

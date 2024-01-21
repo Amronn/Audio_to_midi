@@ -13,7 +13,7 @@ y, sr = librosa.load(file_path)
 # y = librosa.effects.harmonic(y)
 C = np.abs(librosa.cqt(y=y, sr=sr, bins_per_octave=12*3, n_bins=12*3*7, hop_length=hop_length))
 threshold = 0.0
-chroma_orig = librosa.feature.chroma_cqt(C=C, sr=sr, n_chroma=85, bins_per_octave=85*3, threshold=threshold, hop_length=hop_length, norm=1)
+chroma_orig = librosa.feature.chroma_cqt(C=C, sr=sr, n_chroma=12, bins_per_octave=12*3, threshold=threshold, hop_length=hop_length, norm=1)
 # librosa.display.specshow(chroma_orig, y_axis='chroma', x_axis='time', sr=sr)
 # plt.show()
 def get_onsets(y, sr):
@@ -82,7 +82,7 @@ for chroma in chroma:
 # print(len(chroma_av))
 
 for i in range(number_of_keys):
-    folder_path = f'notes_88_v3_cqt/{i}'
+    folder_path = f'notes_12_cqt/{i}'
     os.makedirs(folder_path, exist_ok=True)
     for k in range(number_of_samples):
         f_name = f'chroma_{note_names[i%12]}{i//12}{k}.csv'

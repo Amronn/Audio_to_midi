@@ -5,6 +5,8 @@ import sklearn
 from sklearn.preprocessing import MinMaxScaler
 import os
 
+import matplotlib.pyplot as plt
+
 file_name = ['liszt_frag.wav','bach.mp3', '88notes.wav', 'piano_test.wav', 'piano_test.wav','test_piano_a0_c2.wav', 'test_5.wav']
 file_path = 'wav_sounds/'+file_name[0]
 
@@ -36,10 +38,11 @@ chroma_orig = librosa.feature.chroma_cqt(C=C, sr=sr, n_chroma=85, bins_per_octav
 chroma_orig2 = librosa.feature.chroma_cqt(C=C, sr=sr, n_chroma=12, bins_per_octave=12*3, threshold=threshold, hop_length=hop_length, norm=1)
 
 # import matplotlib.pyplot as plt
-# librosa.display.specshow(chroma_orig, y_axis='chroma', x_axis='time', sr=sr)
-# plt.show()
-# librosa.display.specshow(chroma_orig2, y_axis='chroma', x_axis='time', sr=sr)
-# plt.show()
+librosa.display.specshow(chroma_orig, y_axis='chroma', x_axis='time', sr=sr)
+plt.show()
+
+librosa.display.specshow(chroma_orig2, y_axis='chroma', x_axis='time', sr=sr)
+plt.show()
 
 def get_onsets(y, sr):
     oenv = librosa.onset.onset_strength(y=y, sr=sr, aggregate=np.mean, detrend=True)

@@ -9,6 +9,7 @@ chords = []
 
 for k in range(number):
     n = np.random.randint(1,5)
+    #n=1
     chord = []
     for i in range(n):
         chord.append(np.random.randint(40,80))
@@ -23,8 +24,6 @@ track = MidiTrack()
 mid.tracks.append(track)
 
 for i, time in enumerate(times):
-    # track.append(Message('note_on', note=chords[i], velocity=127, time = 1000))
-    # track.append(Message('note_off', note=chords[i], velocity=127, time = 0))
     for note in chords[i]:
         track.append(Message('note_on', note=note, velocity=127, time = 0))
     for note in chords[i]:
