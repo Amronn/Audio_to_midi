@@ -1,7 +1,7 @@
 # Audio_to_midi
 
 Głównym celem projektu jest rozpoznanie dźwięków w utworach monofonicznych (lub polifonicznych) z użyciem różnych metod. Większość programów korzysta z bibiotek librosa, numpy, scipy itp.
-Główne programy projektu znajdują się w folderze monophonic/audio_to_midi.
+Główne programy projektu znajdują się w folderze monophonic_music/audio_to_midi.
 
 1. Stft - audio_to_midi_fourier_test.py
 2. Cqt/chroma - audio_to_midi_chroma.py
